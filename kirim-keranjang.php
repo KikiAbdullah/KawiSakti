@@ -19,21 +19,19 @@ while ($show = mysqli_fetch_array($queryIdUser)) {
 if (isset($_GET['submit'])) {
     $idPaket = $_GET['id_paket'];
     $jamPesan = $time;
+    $total = NULL;
 
-    
-//ambil data paket berdasarkan ID yang bakal dimasukin ke keranjang
-    $selectPaket = mysqli_query($mysqli, "SELECT * FROM paket WHERE id_paket='$idPaket'") or die("data salah: " . mysqli_error($mysqli));
+    $selectPaket = mysqli_query($mysqli, "SELECT JUMLAH_SET , HARGA FROM paket WHERE ID_PAKET='$idPaket'") or die("data salah: " . mysqli_error($mysqli));
     while ($show = mysqli_fetch_array($selectPaket)) {
-        $jumlahSet = $show['jumlah_set'];
-        $harga = $show['harga'];
+        $jumlahSet = $show['JUMLAH_SET'];
+        $harga = $show['HARGA'];
         $total = $jumlahSet * $harga;
     }
+    
+//INSERT transaksi_item 
+    $insertTransaksiItem = mysqli_query($mysqli, "INSERT INTO transaksi_item SET ID_PAKET='$idPaket', TOTAL='$total'") or die("data salah: " . mysqli_error($mysqli));
 
-
-//masukin data dari paket ke keranjang
-    $queryAddKeranjang = mysqli_query($mysqli, "INSERT INTO keranjang SET id_penyewa='$idUser', id_paket='$idPaket', jam_pemesanan = '$jamPesan', status='cart', total='$total'") or die("data salah: " . mysqli_error($mysqli));
-
-    if ($queryAddKeranjang) {
-        header("Location: profilBar.php"); //go to page profilbar
+    if ($insertTransaksiItem) {
+        // header("Location: profilBar.php"); //go to page profilbar
     }
 }
